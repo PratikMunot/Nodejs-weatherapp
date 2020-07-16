@@ -1,0 +1,76 @@
+const express = require('express')
+const hbs = require('hbs')
+const geocode = require('./src/utils/geocode')
+const forecast = require('./src/utils/forecast')
+const app = express()
+
+
+app.set('view engine','hbs')
+
+app.set('views','templates/views')
+app.use(express.static(__dirname+'/public'));
+// app.set(name,value)
+
+hbs.registerPartials('templates/partials')
+app.get('',(req,res)=>{
+    res.render('index',{
+        title:"Weather App",
+        name:"Pratik Munot"
+    })
+})
+
+app.get('/about',(req,res)=>{
+    res.render('about',{
+        title:"Weather App",
+        name:"Pratik Munot"
+    })
+})
+
+app.get('/help',(req,res)=>{
+    res.end('this is a help page')
+})
+
+app.get('/weather',(req,res)=>{
+    if(!req.query.address){
+        return res.send({
+            error:"You must provide an address"
+        })
+    }
+    // ={} is just setting default param for function args
+    geocode(req.query.address,(error,{latitude,longitude,location}={}) => {
+        if (error) {
+            return res.send({error})
+        }
+        forecast(latitude, longitude, function (error, forecastdata) {
+            if (error) {
+                return res.send({error})
+            }
+            res.send({
+                forecast:forecastdata,
+                location,
+                address:req.query.address
+            })
+        })
+    })
+})
+
+app.get('/products',(req,res)=>{
+    if(!req.query.search){
+        return res.send({
+            error:"You must provide a search here"
+        })
+    }
+
+    res.send({
+        products:[]
+    })
+})
+
+app.get('*',(req,res)=>{
+    res.send('<h1>404 <br> Bad Request</h1>')
+})
+
+app.listen(3000)
+
+// we can use nodemon app.js -e js,hbs
+// to run the file so thatnodemon will monitor all the changes made with extension of files that we listed
