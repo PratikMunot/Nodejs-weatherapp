@@ -4,6 +4,12 @@ const geocode = require('./src/utils/geocode')
 const forecast = require('./src/utils/forecast')
 const app = express()
 
+// when we run our app locally  we run on a common development port which is 3000
+// but when heroku will run the app on its server it will povide us with a different port num
+// so we use the following code to set the port num
+// heroku will provide port num via process.env.PORT so we use logical OR oper in JS
+// which will check if process.env.PORT exists then tet that value as port num slse set 3000 as port num
+const port = process.env.PORT || 3000
 
 app.set('view engine','hbs')
 
@@ -70,7 +76,9 @@ app.get('*',(req,res)=>{
     res.send('<h1>404 <br> Bad Request</h1>')
 })
 
-app.listen(3000)
+app.listen(port,()=>{
+    console.log("Server is up on port : "+port )
+})
 
 // we can use nodemon app.js -e js,hbs
 // to run the file so thatnodemon will monitor all the changes made with extension of files that we listed
